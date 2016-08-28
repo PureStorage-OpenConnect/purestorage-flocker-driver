@@ -592,8 +592,6 @@ class FlashArrayBlockDeviceAPI(object):
         self._disconnect_volume(blockdevice_id)
         eliot.Message.new(Info="Finished detaching volume" + str(blockdevice_id)).write(_logger)
 
-
-
     def list_volumes(self):
         """
         Return ``BlockDeviceVolume`` instances for all managed volumes.
@@ -617,8 +615,15 @@ class FlashArrayBlockDeviceAPI(object):
                     # else that is connected. It *should* only ever be one
                     # host, but just in case we loop through them all...
                     if connection['host'] == self._purity_hostname:
-                        attached_to = self._purity_hostname
-                        break
+                        # Make sure there is a path on the system, meaning
+                        # it is fully attached.
+                        try:
+                            self.get_device_path(name)
+                        except blockdevice.UnattachedVolume:
+                            pass
+                        else:
+                            attached_to = self._purity_hostname
+                            break
                     else:
                         attached_to = connection['host']
                 eliot.Message.new(Info="Volume %s attached_to = %s" % (vol['name'], attached_to)).write(_logger)
