@@ -16,8 +16,8 @@ ClusterHQ/Flocker provides an efficient and easy way to connect persistent store
     ```
     * Centos<br>
     ```bash
-    sudo yum -y install iscsi-initiator-utils
-    sudo yum -y install device-mapper-multipath
+    sudo yum update
+    sudo yum -y install iscsi-initiator-utils device-mapper-multipath
     ```
 
 - Install ClusterHQ/Flocker<br>
@@ -32,7 +32,7 @@ https://docs.clusterhq.com/en/latest/
     pip install purestorage-flocker-driver/
     ```
     The pip install will probably need to be run as root or with sudo depending on the environment. If flocker is running with
-    a virtual environment you may need to install into the same one. For example on Ubuntu 14.04, as root, run:
+    a virtual environment you may need to install into the same one. For example on Ubuntu 14.04 or CentOS 7, as root, run:
 
     ```bash
     source /opt/flocker/bin/activate
@@ -40,13 +40,15 @@ https://docs.clusterhq.com/en/latest/
     pip install purestorage-flocker-driver/
     ```
     
-    Alternatively if pip is not available you can clone or download the driver code and install manually.
+    Alternatively you can clone or download the driver code and install manually.
     
     ```bash
     git clone https://github.com/PureStorage-OpenConnect/purestorage-flocker-driver.git
     cd purestorage-flocker-driver
     python setup.py install
     ```
+    Note that this will *not* install the dependencies. You will need to manually install requirements from the `requirements.txt` file (specific versions are important!).
+
 
 - Ensure that `scsi_id` is available on the path for the flocker-dataset-agent service.
 
@@ -80,6 +82,21 @@ dataset:
     pure_chap_host_password: ${pure_chap_host_password}  # Optional
     pure_verify_https: ${pure_verify_https} # Optional
     pure_ssl_cert: ${pure_ssl_cert}  # Optional
+```
+
+Example agent.yml dataset configuration for Pure:
+
+```bash
+version: 1
+control-service:
+   hostname: flocker-controller-1.dev.purestorage.com
+   port: 4524
+
+dataset:
+    backend: purestorage_flasharray_flocker_driver
+    pure_ip: 10.231.128.11
+    pure_api_token: 661f9687-0b1e-7b0d-e07d-1e776d50f9eb
+
 ```
 
 ### Required Parameters
@@ -121,7 +138,31 @@ Create a fork of the project into your own repository. Make all your necessary c
 
 ## Running Tests
 
-Run the tests
+Setup the Flocker dev environment
+```bash
+git clone https://github.com/ClusterHQ/flocker.git
+
+virtualenv flocker-test-env
+source ./flocker-test-env/bin/activate
+
+cd ./flocker
+pip install --requirement dev-requirements.txt
+cd ..
+
+```
+Refer to https://docs.clusterhq.com/en/latest/gettinginvolved/contributing.html for the most up to date instructions.
+
+All further steps need to be using the virtualenv!
+
+Install the Pure driver
+```bash
+git clone https://github.com/PureStorage-OpenConnect/purestorage-flocker-driver.git
+
+cd purestorage-flocker-driver/
+pip install .
+```
+
+Run the tests (from the root of purestorage-flocker-driver, while )
 ```bash
 trial tests.test_purestorage
 ```
@@ -133,7 +174,7 @@ file using a Pure Storage FlashArray backend.
 
 Compatibility
 -------------
-This plugin has been tested and verified with Flocker 1.12.0 on Ubuntu and CentOS based systems.
+This plugin has been tested and verified with Flocker 1.14.0 on Ubuntu and CentOS based systems.
 
 It will support Pure FlashArray's running Purity version 3.4.0 and newer.
 
