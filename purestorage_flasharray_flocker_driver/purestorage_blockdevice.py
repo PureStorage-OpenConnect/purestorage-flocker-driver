@@ -107,6 +107,7 @@ ISCSI = 'ISCSI'
 ERR_MSG_ALREADY_EXISTS = 'already exists'
 ERR_MSG_NOT_EXIST = 'does not exist'
 ERR_MSG_PENDING_ERADICATION = 'has been destroyed'
+ERR_MSG_NOT_CONNECTED = 'is not connected'
 
 class InvalidConfig(Exception):
     def __init__(self, reason):
@@ -523,6 +524,11 @@ class FlashArrayBlockDeviceAPI(object):
         """
         try:
             eliot.Message.new(Info="Destroying Volume" + str(blockdevice_id)).write(_logger)
+            try:
+                self._disconnect_volume(blockdevice_id)
+            except blockdevice.UnattachedVolume:
+                # Don't worry if it is not connected, normally it won't be
+                pass
             self._array.destroy_volume(blockdevice_id)
         except purestorage.PureHTTPError as err:
             if (err.code == 400 and
