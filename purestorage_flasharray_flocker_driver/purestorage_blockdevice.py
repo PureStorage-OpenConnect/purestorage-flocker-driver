@@ -167,7 +167,7 @@ class FlashArrayBlockDeviceAPI(object):
     (devices) with Pure Storage FlashArray.
     """
 
-    VERSION = '1.0.0'
+    VERSION = '1.0.1'
 
     def __init__(self, configuration, cluster_id):
         """
