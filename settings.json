@@ -1,0 +1,7 @@
+{
+    "id": "purestorage-flocker-driver",
+    "filter": "containers",
+    "image": "http://code.purestorage.com/images/image6.png",
+    "featured": 1,
+    "priority": 1
+}
