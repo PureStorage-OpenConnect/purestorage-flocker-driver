@@ -3,5 +3,5 @@
     "filter": "containers",
     "image": "http://code.purestorage.com/images/7_PureStorage-Flocker-Driver.png",
     "featured": 0,
-    "priority": 1
+    "priority": 3
 }
